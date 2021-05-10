@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const iconic = require('../lib');
+
+const options = getOptions();
+
+let pack = new iconic.Pack();
+
+options.files.forEach(filename => {
+  let name = path.basename(filename, path.extname(filename)),
+    source = fs.readFileSync(filename, 'utf-8'),
+    icon = new iconic.Icon(source, name);
+  pack.addIcon(icon);
+});
+
+fs.writeFileSync(options.output, pack.bundle(options.element));
+
+console.log(`File «${options.output}» writed successfully!`);
+
+function getOptions() {
+  let args = process.argv.slice(2),
+    output = 'bundle.js',
+    element = 'ui-icon',
+    files = [];
+  args.forEach(arg => {
+    if (arg.startsWith('--')) {
+      let name = arg.slice(2).split('=')[0],
+        value = arg.slice(2).split('=')[1];
+      if (name === 'output') output = path.resolve(process.cwd(), value);
+      if (name === 'element') element = value;
+    } else {
+      files.push(path.resolve(process.cwd(), arg));
+    }
+  });
+  return {
+    output,
+    element,
+    files,
+  };
+}
