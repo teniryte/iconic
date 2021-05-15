@@ -118,3 +118,7 @@ pack.bundle((elementName = 'ui-icon'));
 // Is pack contains colored icons
 pack.isColored();
 ```
+
+### DevPlugins
+
+- `ooi`;

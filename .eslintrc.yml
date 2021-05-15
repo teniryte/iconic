@@ -1,6 +1,7 @@
 env:
   browser: true
   es2021: true
+  node: true
 extends:
   - 'plugin:node/recommended'
   - 'eslint:recommended'
@@ -8,12 +9,22 @@ extends:
 parserOptions:
   ecmaFeatures:
     jsx: true
-  ecmaVersion: 12
-react:
-  "flowVersion": "0.53"
+  ecmaVersion: 2020
+  modules: true
+  spread: true
+  restParams: true
 plugins:
   - react
+settings:
+  react:
+    createClass: createReactClass
+    pragma: React
+    fragment: Fragment
+    version: detect
+    flowVersion: '0.53'
 rules:
+  newline-per-chained-call:
+    - 2
   quotes:
     - error
     - single
@@ -30,9 +41,6 @@ rules:
   node/exports-style:
     - error
     - module.exports
-  node/file-extension-in-import:
-    - error
-    - always
   node/prefer-global/buffer:
     - error
     - always
@@ -48,9 +56,14 @@ rules:
   node/prefer-global/url:
     - error
     - always
-  node/prefer-promises/dns:
+  node/prefer-promises/dns: error
+  node/file-extension-in-import:
     - error
-  node/prefer-promises/fs:
-    - error
-  newline-per-chained-call:
-    - 2
+    - always
+  node/prefer-promises/fs: error
+
+overrides:
+  - files:
+      - 'node_modules'
+    rules:
+      sourceType: 2

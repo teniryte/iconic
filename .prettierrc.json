@@ -1,7 +1,6 @@
 {
   "arrowParens": "avoid",
   "singleQuote": true,
-  "at-rule-no-unknown": true,
   "endOfLine": "lf",
   "jsxBracketSameLine": true,
   "openingBraceNewLine": true
