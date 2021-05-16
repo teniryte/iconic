@@ -1,6 +1,6 @@
 {
   "name": "iconic",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "main": "./lib/index.js",
   "description": "Tools for SVG icons",
   "keywords": [
@@ -15,7 +15,12 @@
   "homepage": "https://github.com/teniryte/iconic",
   "license": "MIT",
   "devDependencies": {},
-  "dependencies": {},
+  "dependencies": {
+    "convert-svg-to-jpeg": "^0.5.0",
+    "convert-svg-to-png": "^0.5.0",
+    "ooi": "^0.1.60",
+    "svgo-sync": "^0.5.1"
+  },
   "scripts": {
     "test": "./node_modules/.bin/mocha ./test/index.js"
   },
