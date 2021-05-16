@@ -1,6 +1,6 @@
 {
   "name": "iconic",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "main": "./lib/index.js",
   "description": "Tools for SVG icons",
   "keywords": [
@@ -15,9 +15,7 @@
   "homepage": "https://github.com/teniryte/iconic",
   "license": "MIT",
   "devDependencies": {},
-  "dependencies": {
-    "puppeteer": "^9.1.1"
-  },
+  "dependencies": {},
   "scripts": {
     "test": "./node_modules/.bin/mocha ./test/index.js"
   },
