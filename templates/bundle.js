@@ -2,6 +2,10 @@
   const ICONS = '{{icons}}',
     elementName = '{{elementName}}';
 
+  window.__GET_ICONIC_ICONS__ = () => {
+    return { ...ICONS };
+  };
+
   addStyles();
   createElement();
 
