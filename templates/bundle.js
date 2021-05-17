@@ -1,67 +1,151 @@
+// @ts-nocheck
 (function () {
-  const ICONS = '{{icons}}',
-    elementName = '{{elementName}}';
+  if (window.iconic) return;
 
-  window.__GET_ICONIC_ICONS__ = () => {
-    return { ...ICONS };
-  };
+  class Iconic {
+    icons = {};
+    mods = {};
 
-  addStyles();
-  createElement();
+    async init() {
+      customElements.define('ico-nic', IconicLoader);
+    }
 
-  function createElement() {
-    class IconicIcon extends HTMLElement {
-      constructor(...args) {
-        super(...args);
-        this.iconName = '';
-      }
+    async load() {
+      await this.applyStyles();
+      await this.loadIcons();
+      await this.defineIconClasses();
+    }
 
-      render() {
-        this.innerHTML = ICONS[this.iconName];
-      }
+    async applyStyles() {
+      let response = await fetch('/css/iconic.css'),
+        css = await response.text(),
+        style = document.createElement('style');
+      style.innerHTML = css;
+      document.head.appendChild(style);
+    }
 
-      connectedCallback() {
-        this.iconName = this.getIconName();
-        this.classList.add('iconic-icon');
-        this.classList.add(elementName);
-        this.render();
-      }
+    async defineIconClasses() {
+      Object.keys(this.mods).forEach(elementName => {
+        this.defineIconClass(elementName);
+      });
+    }
 
-      static get observedAttributes() {
-        return ['name', 'icon'];
-      }
-
-      attributeChangedCallback(name, oldValue, newValue) {
-        this.iconName = this.getIconName();
-        this.render();
-      }
-
-      getIconName() {
-        return this.getAttribute('name') || this.getAttribute('icon');
+    async loadIcons() {
+      let packs = [];
+      Object.keys(this.mods).forEach(elementName => {
+        packs = [...packs, ...this.mods[elementName].packs];
+      });
+      packs = Array.from(new Set(packs));
+      for (let i = 0; i < packs.length; i++) {
+        let packName = packs[i];
+        await this.loadPackIcons(packName);
       }
     }
 
-    customElements.define(elementName, IconicIcon);
-  }
+    async loadPackIcons(packName) {
+      let url = `/api/pack/${packName}/`,
+        response = await fetch(url),
+        data = await response.json(),
+        icons = data.icons;
+      Object.assign(this.icons, icons);
+    }
 
-  function addStyles() {
-    let styles = `
-      .iconic-icon {
-        display: inline-block;
-        fill: inherit;
-        width: 1em;
-        height: 1em;
+    getIconsNames(elementName) {
+      let mod = this.mods[elementName],
+        names = [];
+      Object.keys(this.icons).filter(key => {
+        let pack = key.split('.')[0];
+        if (!mod.packs.includes(pack)) return;
+        names.push(mod.isShort ? key.split('.').slice(1).join('.') : key);
+      });
+      return names;
+    }
+
+    addMod(elementName, packs, isShort = false) {
+      this.mods[elementName] = {
+        elementName: elementName,
+        packs: packs,
+        isShort: isShort,
+      };
+    }
+
+    getIconCode(elementName, name) {
+      let mod = this.mods[elementName];
+      if (mod.isShort) {
+        return this.icons[
+          mod.packs
+            .map(packName => `${packName}.${name}`)
+            .filter(name => !!this.icons[name])[0]
+        ];
+      }
+      return this.icons[name];
+    }
+
+    defineIconClass(elementName) {
+      class IconElement extends HTMLElement {
+        static get observedAttributes() {
+          return ['icon'];
+        }
+
+        constructor(...args) {
+          super(...args);
+        }
+
+        render() {
+          let iconName = this.getIconName(),
+            code = iconic.getIconCode(elementName, iconName);
+          this.innerHTML = code || '';
+        }
+
+        connectedCallback() {
+          this.setAttribute('class', `iconic-icon ${elementName}`);
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          this.render();
+        }
+
+        getIconName() {
+          return this.getAttribute('icon');
+        }
       }
 
-      .iconic-icon svg {
-        width: 100%;
-        height: 100%;
-        fill: inherit;
-      }
-    `,
-      style = document.createElement('style');
-
-    style.innerHTML = styles;
-    document.head.appendChild(style);
+      customElements.define(elementName, IconElement);
+    }
   }
+
+  class IconicLoader extends HTMLElement {
+    static get observedAttributes() {
+      return ['element', 'packs', 'short'];
+    }
+
+    constructor(...args) {
+      super(...args);
+
+      this.attrs = {};
+    }
+
+    attributeChangedCallback(name, oldValue, value) {
+      this.attrs[name] = value;
+    }
+
+    connectedCallback() {
+      iconic.addMod(
+        this.attrs.element,
+        this.attrs.packs.split(' '),
+        this.attrs.short === 'short'
+      );
+      this.remove();
+    }
+  }
+
+  const iconic = new Iconic();
+
+  iconic.init();
+
+  document.addEventListener('DOMContentLoaded', ev => {
+    iconic.load();
+  });
+
+  window.iconic = iconic;
 })();
