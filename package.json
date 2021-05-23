@@ -1,6 +1,6 @@
 {
   "name": "iconic",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "main": "./lib/index.js",
   "description": "Tools for SVG icons",
   "keywords": [
@@ -30,5 +30,10 @@
   "author": {
     "name": "teniryte",
     "email": "teniryte@gmail.com"
-  }
+  },
+  "publishConfig": {
+    "registry": "https://pm.cort.one"
+  },
+  "push": true,
+  "publish": true
 }
